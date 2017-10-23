@@ -1,4 +1,5 @@
 var fs = require('fs');
+var getCommuteTime = require ('getCommuteTime.js')
 
 // fs.readFile('addressList.csv', 'utf8', (err, data) => {
 //   if (err) throw err;

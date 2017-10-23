@@ -12,11 +12,11 @@ var key = 'key';
 
 var urlparams = {};
 
-urlparams[origin] = 'ENTER START ADDRESS HERE';
+urlparams[origin] = 'Rocky Hill, CT';
 urlparams[arrival_time] = '1509366600';
-urlparams[destination] = 'ENTER END ADDRESS HERE';
+urlparams[destination] = 'Hartford, CT';
 urlparams[mode] = 'driving';
-urlparams[key] = 'ENTER API KEY HERE';
+urlparams[key] = 'AIzaSyCeZrY8CQRWiGBkP7Z6MO9bnAIGIhYmU6U';
 
 var encodedparams = querystring.stringify(urlparams);
 
@@ -31,24 +31,41 @@ var options = {
 
 //execute api call
 
-var req = https.request(options, (res) => {
-  console.log('STATUS: ' + res.statusCode);
+function makeCall (options, callback) {
+	var req = https.request(options, (res) => {
+	  console.log('STATUS: ' + res.statusCode);
 
-	var responseString = ''
+		var responseString = ''
 
-	  res.on('data', (d) => {
-	    responseString += d;
-	  });
+		  res.on('data', (d) => {
+		    responseString += d;
+		  });
 
-	  res.on('end', function() {
-		var parsedJson = JSON.parse(responseString)
-		fs.appendFileSync('commute.csv', parsedJson.routes[0].legs[0].start_address + ", " + Math.round((parsedJson.routes[0].legs[0].duration.value)/60) + '\r\n')
-		console.log('Success: File created')	 
-	  });
-	})
+		  res.on('end', function() {
+			callback = responseString
+			
+		console.log('Callback: ' + responseString)	
+			 
+		  });
+		})
 
-	req.on('error', (e) => {
-	  console.error(e);
-	});
+		req.on('error', (e) => {
+		  console.error(e);
+		});
 
-req.end();
+	req.end();
+}
+
+function handleResults(results){
+    var parsedJSON = json.parse(results)
+    fs.appendFileSync('commute.csv', parsedJSON.routes[0].legs[0].start_address + ", " + Math.round((parsedJSON.routes[0].legs[0].duration.value)/60) + '\r\n')
+	console.log('Success: File created')	
+}
+
+makeCall(options, function(results){
+    console.log('results:',results);
+    handleResults(results);        
+});
+
+
+//fs.appendFileSync('commute.csv', parsedJson.routes[0].legs[0].start_address + ", " + Math.round((parsedJson.routes[0].legs[0].duration.value)/60) + '\r\n')	 
